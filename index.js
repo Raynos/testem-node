@@ -1,8 +1,9 @@
 var io = require("socket.io-client")
     , tap = require("tap")
     , extend = require("xtend")
-    , Runner = tap.createRunner
-    , runner
+    , Consumer = tap.Consumer
+    , spawn = require("child_process").spawn
+    , consumer
     , first = false
     , results = {
         failed: 0
@@ -13,59 +14,51 @@ var io = require("socket.io-client")
     , defaultTestemOptions = {
         port: 7357
         , host: "localhost"
-    }
-    , defaultTapOptions = {
-        version: false
-        , help: false
-        , timeout: 30
-        , diag: process.env.TAP_DIAG
-        , tap: process.env.TAP_DIAG
-        , stderr: process.env.TAP_STDERR
-        , cover:  "./lib"
-        , "cover-dir": "./coverage"
+        , command: "node"
+        , args: []
     }
 
 module.exports = connectToTestem
 
-function connectToTestem(tapOptions, testemOptions) {
+function connectToTestem(testemOptions) {
     testemOptions = extend({}, defaultTestemOptions, testemOptions || {})
-    tapOptions = extend({}, defaultTapOptions, tapOptions || {})
 
     var socket = io.connect("http://" + testemOptions.host + ":" +
         testemOptions.port)
-        , runTests = startTests.bind(null, tapOptions, socket)
 
-    socket.emit("browser-login", "Node")
-    socket.on("connect", runTests)
-    socket.on("reconnect", runTests)
-    socket.on("start-tests", runTests)
-}
+    emit("browser-login", "Node")
+    socket.on("connect", startTests)
+    socket.on("reconnect", startTests)
+    socket.on("start-tests", startTests)
 
-function startTests(tapOptions, socket) {
-    socket.emit("browser-login", "Node")
-    if (runner) {
-        runner.removeListener("file", onFile)
-        runner.removeListener("end", onEnd)
+    function startTests() {
+        emit("browser-login", "Node")
+        if (consumer) {
+            consumer.removeListener("data", onData)
+            consumer.removeListener("end", onEnd)
+        }
+
+        consumer = new Consumer()
+
+        consumer.on("data", onData)
+
+        consumer.on("end", onEnd)
+
+        var child = spawn(testemOptions.command, testemOptions.args)
+        child.stdout.pipe(consumer)
+        child.stderr.pipe(process.stderr)
     }
-
-    runner = new Runner(tapOptions)
-
-    runner.on("file", onFile.bind(null, emit))
-
-    runner.on("end", onEnd.bind(null, emit))
 
     function emit() {
         socket.emit.apply(socket, arguments)
     }
-}
 
-function onFile(emit, file, data, details) {
-    if (first === false) {
-        first = true
-        emit("tests-start")
-    }
+    function onData(data) {
+        if (first === false) {
+            first = true
+            emit("tests-start")
+        }
 
-    details.list.forEach(function (data) {
         if (data.id === undefined) {
             return
         }
@@ -83,7 +76,7 @@ function onFile(emit, file, data, details) {
             tst.items.push({
                 passed: false
                 , message: data.name
-                , stacktrace: data.stack.join("\n")
+                , stacktrace: data.stack && data.stack.join("\n")
             })
             results.failed++
             tst.failed++
@@ -96,9 +89,9 @@ function onFile(emit, file, data, details) {
         results.tests.push(tst)
 
         emit("test-result", tst)
-    })
-}
+    }
 
-function onEnd(emit) {
-    emit("all-test-results", results)
+    function onEnd(err, count, passed) {
+        emit("all-test-results", results)
+    }
 }
