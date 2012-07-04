@@ -7,12 +7,12 @@ Connect to a testem server and run the unit tests in node.js
     var testemNode = require("testem-node")
 
     testemNode({
-        port: 7357
-        , host: "localhost"
-    }, {
         argv: {
             remain: process.cwd() + "/test"
         }
+    }, {
+        port: 7357
+        , host: "localhost"
     })
 
-The first argument to testemNode consist of the port & localhost of the testem server. The second argument is options to pass to a node-tap runner.
+The first argument to testemNode is options to pass to a node-tap runner. The second argument consists of the port & localhost of the testem server
