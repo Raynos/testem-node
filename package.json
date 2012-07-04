@@ -1,0 +1,30 @@
+{
+  "name": "testem-node",
+  "version": "0.0.1",
+  "description": "Connect to testem and run node tests",
+  "keywords": [],
+  "author": "Raynos <raynos2@gmail.com>",
+  "repository": "git://github.com/Raynos/testem-node.git",
+  "main": "index",
+  "homepage": "https://github.com/Raynos/testem-node",
+  "contributors": [
+    {
+      "name": "Jake Verbaten"
+    }
+  ],
+  "bugs": {
+    "url": "https://github.com/Raynos/testem-node/issues",
+    "email": "raynos2@gmail.com"
+  },
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "http://github.com/raynos/testem-node/raw/master/LICENSE"
+    }
+  ],
+  "dependencies": {
+    "tap": "~0.2.5",
+    "socket.io-client": "~0.9.6",
+    "xtend": "~1.0.3"
+  }
+}
