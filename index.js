@@ -22,7 +22,9 @@ var io = require("socket.io-client")
 module.exports = connectToTestem
 
 function connectToTestem(testemOptions) {
-    var stream = es.through()
+    var stream = es.through(function (data) {
+        this.emit("data", data)
+    }, noop)
 
     testemOptions = extend({}, defaultTestemOptions, testemOptions || {})
 
@@ -101,3 +103,5 @@ function connectToTestem(testemOptions) {
         emit("all-test-results", results)
     }
 }
+
+function noop() {}
