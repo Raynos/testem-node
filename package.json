@@ -1,6 +1,6 @@
 {
   "name": "testem-node",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Connect to testem and run node tests",
   "keywords": [],
   "author": "Raynos <raynos2@gmail.com>",
@@ -25,6 +25,7 @@
   "dependencies": {
     "tap": "~0.2.5",
     "socket.io-client": "~0.9.6",
-    "xtend": "~1.0.3"
+    "xtend": "~1.0.3",
+    "event-stream": "2.1.7"
   }
 }
