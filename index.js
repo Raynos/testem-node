@@ -38,6 +38,7 @@ function connectToTestem(testemOptions) {
 
     function startTests() {
         emit("browser-login", "Node")
+        stream.write("login again")
         if (consumer) {
             consumer.removeListener("data", onData)
             consumer.removeListener("end", onEnd)
