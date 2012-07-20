@@ -17,10 +17,13 @@ var io = require("socket.io-client")
         , command: "node"
         , args: []
     }
+    , es = require("event-stream")
 
 module.exports = connectToTestem
 
 function connectToTestem(testemOptions) {
+    var stream = es.through()
+
     testemOptions = extend({}, defaultTestemOptions, testemOptions || {})
 
     var socket = io.connect("http://" + testemOptions.host + ":" +
@@ -30,6 +33,8 @@ function connectToTestem(testemOptions) {
     socket.on("connect", startTests)
     socket.on("reconnect", startTests)
     socket.on("start-tests", startTests)
+
+    return stream
 
     function startTests() {
         emit("browser-login", "Node")
@@ -46,7 +51,7 @@ function connectToTestem(testemOptions) {
 
         var child = spawn(testemOptions.command, testemOptions.args)
         child.stdout.pipe(consumer)
-        child.stderr.pipe(process.stderr)
+        child.stderr.pipe(stream)
     }
 
     function emit() {
