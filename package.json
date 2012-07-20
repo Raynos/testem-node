@@ -1,6 +1,6 @@
 {
   "name": "testem-node",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Connect to testem and run node tests",
   "keywords": [],
   "author": "Raynos <raynos2@gmail.com>",

@@ -54,7 +54,9 @@ function connectToTestem(testemOptions) {
 
         var child = spawn(testemOptions.command, testemOptions.args)
         child.stdout.pipe(consumer)
-        child.stderr.pipe(stream)
+        child.stderr.on("data", function (data) {
+            stream.write(data)
+        })
     }
 
     function emit() {
